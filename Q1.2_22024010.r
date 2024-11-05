@@ -23,6 +23,7 @@ results <- sapply(wages_rows, function(i) {
   c(mean = mean(wages),
     mode = get_mode(wages),
     median = median(wages),
+    range=max(wages)-min(wages),
     sd = sd(wages),
     variance = var(wages),
     quartiles = list(quantile(wages, probs = c(0.25, 0.5, 0.75))),

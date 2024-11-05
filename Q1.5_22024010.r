@@ -26,11 +26,11 @@ get_row <- function(row, data) {
 
 # Function to create and save box plots to a PDF
 create_box_plot_pdf <- function(rows, data, group_names, fleets, file_name) {
-  pdf(file.path("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Results", file_name), width = 8, height = 6)
-  
+  pdf(file.path("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts", file_name), width = 8, height = 6)
+  colors <- c("lightblue", "lightgreen", "lightpink")
   for (i in 1:nrow(rows)) {
     values <- lapply(rows[i, ], get_row, data = data)  # Get data for all groups in a row
-    boxplot(values, names = group_names, main = fleets[i], xlab = "Groups", ylab = "Values")
+    boxplot(values, names = group_names, main = fleets[i], xlab = "Groups", ylab = "Values", col=colors[1:ncol(rows)])
   }
   
   dev.off()  # Close the PDF device
