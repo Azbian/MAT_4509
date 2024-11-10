@@ -1,21 +1,13 @@
 library(readxl)
-
 ####################################
 ########## Data Loading ############
 ####################################
-
 data <- read_excel("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/United Airlines Aircraft Operating Statistics- Cost Per Block Hour (Unadjusted).xls", range="b2:w158") 
 data <- as.data.frame(data)
-
-# Define fleet names and corresponding row indices
 fleets <- c("Small Narrowbodies", "Large Narrowbodies", "Widebodies", "Total Fleet")
-purchased_goods_row <- matrix(c(14, 15, 16, 53, 54, 55, 92, 93, 94, 131, 132, 133) - 2, nrow = 4, byrow = TRUE)
-purchased_goods_names <- c("Fuel/Oil", "Insurance", "Others (Inc. Tax)")
-aircraft_ownership_rows <- matrix(c(26, 27, 65, 66, 104, 105, 143, 144) - 2, nrow = 4, byrow = TRUE)
-aircraft_ownership_names <- c("Rentals", "Depreciation and Amortization")
-daily_utilization_rows <- matrix(c(39, 40, 41, 78, 79, 80, 117, 118, 119, 156, 157, 158) - 2, nrow = 4, byrow = TRUE)
-daily_utilization_names <- c("Block hours", "Airborne hours", "Departures")
-
+years_row <- 3 - 2
+load_factor_rows <- c(36, 75, 114, 153) - 2
+maintanance_rows <- matrix(c(19,20,21,23,58,59,60,62,97,98,99,101,136,137,138,140) - 2, nrow = 4, byrow = FALSE)
 ####################################
 ########## Functions ###############
 ####################################
@@ -24,19 +16,63 @@ get_row <- function(row, data) {
   na.omit(as.numeric(data[row, -1]))[1:10]
 }
 
-# Function to create and save box plots to a PDF
-create_box_plot_pdf <- function(rows, data, group_names, fleets, file_name) {
-  pdf(file.path("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Results", file_name), width = 8, height = 6)
-  
-  for (i in 1:nrow(rows)) {
-    values <- lapply(rows[i, ], get_row, data = data)  # Get data for all groups in a row
-    boxplot(values, names = group_names, main = fleets[i], xlab = "Groups", ylab = "Values")
-  }
-  
-  dev.off()  # Close the PDF device
+get_row_sum <- function(row, data) {
+  sum(na.omit(as.numeric(data[row, -1]))[1:10])
 }
 
-# Generate the box plots and save them as PDFs
-create_box_plot_pdf(purchased_goods_row, data, purchased_goods_names, fleets, "Purchased_Goods_Box_Plot.pdf")
-create_box_plot_pdf(aircraft_ownership_rows, data, aircraft_ownership_names, fleets, "Aircraft_Ownership_Box_Plot.pdf")
-create_box_plot_pdf(daily_utilization_rows, data, daily_utilization_names, fleets, "Daily_Utilization_Box_Plot.pdf")
+get_totals <- function(row_matrix, data) {
+  sapply(1:4, function(i) sapply(1:4, function(j) get_row_sum(row_matrix[i, j], data)))
+}
+
+plot_and_save_pies <- function(labour, materials, third_party, burden, labels, save_path) {
+  for (i in 1:4) {
+    values <- c(labour[i], materials[i], third_party[i], burden[i])
+    percentages <- round(values / sum(values) * 100)
+    pie_labels <- paste(c("Labour", "Materials", "Third party", "Burden"), percentages, "%")
+    file_name <- paste0(save_path, "/", labels[i], "_maintenance_pie.png")
+    # Open a PNG device and save the plot
+    png(filename = file_name, width = 600, height = 600)
+    pie(values, labels = pie_labels, main = labels[i], col = rainbow(length(values)))
+    dev.off()  # Close the device to save the file
+  }
+}
+
+create_barplot <- function(years_row, load_factor_rows, fleets, save_path) {
+  years <- get_row(years_row, data)
+  for (i in seq_along(load_factor_rows)) {
+    load_factors <- get_row(load_factor_rows[i], data)
+    fleet_name <- fleets[i]
+    file_name <- paste0(save_path, "/barplot_", fleet_name, ".png")
+    png(file_name, width = 800, height = 600)
+    barplot(load_factors, names.arg = years, col = "skyblue",
+            main = paste("Load Factors for", fleet_name),
+            xlab = "Years", ylab = "Load Factors")
+    dev.off()
+  }
+  message("Bar plots saved successfully in ", save_path)
+}
+
+
+# Define save path
+save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts"
+# Create directory if it doesn't exist
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+}
+# Calculate totals for each category
+totals <- get_totals(maintanance_rows, data)
+total_labour <- totals[1, ]
+total_materials <- totals[2, ]
+total_third_party <- totals[3, ]
+total_burden <- totals[4, ]
+# Generate and save pie charts for each fleet
+plot_and_save_pies(total_labour, total_materials, total_third_party, total_burden, fleets, save_path)
+
+
+save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts"
+
+if (!dir.exists(save_path)) {
+  dir.create(save_path, recursive = TRUE)
+}
+
+create_barplot(years_row, load_factor_rows, fleets, save_path)
