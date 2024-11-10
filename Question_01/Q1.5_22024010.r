@@ -24,9 +24,11 @@ get_row <- function(row, data) {
   na.omit(as.numeric(data[row, -1]))[1:10]
 }
 
+save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Question_01/Charts"
+
 # Function to create and save box plots to a PDF
 create_box_plot_pdf <- function(rows, data, group_names, fleets, file_name) {
-  pdf(file.path("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts", file_name), width = 8, height = 6)
+  pdf(file.path(save_path, file_name), width = 8, height = 6)
   colors <- c("lightblue", "lightgreen", "lightpink")
   for (i in 1:nrow(rows)) {
     values <- lapply(rows[i, ], get_row, data = data)  # Get data for all groups in a row

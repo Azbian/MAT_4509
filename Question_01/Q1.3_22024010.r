@@ -19,7 +19,7 @@ create_and_save_table <- function(data, fleet_name) {
   table <- fdt(data, start = min(data), end = max(data), h = interval)
   
   # Save plot as PNG
-  png_filename <- paste0("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts/", fleet_name, "_wages_distribution.png")
+  png_filename <- paste0("B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Question_01/Charts/", fleet_name, "_wages_distribution.png")
   png(filename = png_filename, width = 800, height = 600)
   plot(table, main = paste("Wages Distribution for", fleet_name))
   dev.off()  # Close the PNG device

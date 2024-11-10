@@ -54,7 +54,7 @@ create_barplot <- function(years_row, load_factor_rows, fleets, save_path) {
 
 
 # Define save path
-save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts"
+save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Question_01/Charts"
 # Create directory if it doesn't exist
 if (!dir.exists(save_path)) {
   dir.create(save_path, recursive = TRUE)
@@ -68,8 +68,6 @@ total_burden <- totals[4, ]
 # Generate and save pie charts for each fleet
 plot_and_save_pies(total_labour, total_materials, total_third_party, total_burden, fleets, save_path)
 
-
-save_path <- "B:/BSMRAAU 22024010 5th/MAT_4509/Programming/Charts"
 
 if (!dir.exists(save_path)) {
   dir.create(save_path, recursive = TRUE)
